@@ -1,0 +1,238 @@
+/* ── Reset & Base ─────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --bg:         #1a1a2e;
+    --surface:    #16213e;
+    --card:       #0f3460;
+    --accent:     #e94560;
+    --gold:       #f5a623;
+    --text:       #eaeaea;
+    --text-muted: #8892b0;
+    --green:      #4caf50;
+    --radius:     12px;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    min-height: 100vh;
+    padding-bottom: 24px;
+}
+
+#app {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+/* ── Header ───────────────────────────────────────────────── */
+.header {
+    background: var(--surface);
+    padding: 12px 16px;
+    margin: 0 -16px 16px;
+    border-bottom: 2px solid var(--card);
+}
+
+.player-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.player-info span:first-child {
+    font-weight: 700;
+    font-size: 17px;
+}
+
+#player-level {
+    background: var(--accent);
+    color: #fff;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.xp-bar-wrap {
+    height: 6px;
+    background: var(--card);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 4px;
+}
+
+.xp-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--gold));
+    border-radius: 3px;
+    width: 0%;
+    transition: width 0.5s ease;
+}
+
+.xp-text {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* ── Castle ───────────────────────────────────────────────── */
+.castle-section {
+    display: flex;
+    justify-content: center;
+    margin: 16px 0;
+    min-height: 180px;
+}
+
+#castle-img {
+    max-height: 180px;
+    max-width: 100%;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 20px rgba(233, 69, 96, 0.3));
+}
+
+.castle-placeholder {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 200px;
+    height: 180px;
+    border: 2px dashed var(--card);
+    border-radius: var(--radius);
+    color: var(--text-muted);
+    font-size: 13px;
+}
+
+.castle-placeholder span { font-size: 64px; margin-bottom: 8px; }
+
+/* ── Gold bar ─────────────────────────────────────────────── */
+.gold-bar {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 10px 16px;
+    margin-bottom: 20px;
+    font-size: 15px;
+    color: var(--gold);
+    font-weight: 600;
+}
+
+/* ── Sections ─────────────────────────────────────────────── */
+.section { margin-bottom: 24px; }
+
+.section-title {
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+}
+
+/* ── Resource Cards ───────────────────────────────────────── */
+.resources-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.resource-card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    transition: transform 0.15s;
+}
+
+.resource-card:active { transform: scale(0.97); }
+
+.resource-icon {
+    width: 56px;
+    height: 56px;
+    object-fit: contain;
+}
+
+.resource-icon-fallback {
+    font-size: 40px;
+    line-height: 56px;
+}
+
+.resource-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.resource-amount {
+    font-size: 22px;
+    font-weight: 700;
+}
+
+.resource-btn {
+    width: 100%;
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.resource-btn:active { opacity: 0.8; }
+
+.btn-idle    { background: var(--accent);  color: #fff; }
+.btn-ready   { background: var(--green);   color: #fff; }
+.btn-waiting { background: var(--surface); color: var(--text-muted); cursor: default; }
+
+/* ── Ranking ──────────────────────────────────────────────── */
+.ranking-list { display: flex; flex-direction: column; gap: 8px; }
+
+.ranking-item {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.rank-pos {
+    font-size: 18px;
+    width: 28px;
+    text-align: center;
+    font-weight: 700;
+}
+
+.rank-username { flex: 1; font-weight: 600; }
+
+.rank-level {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+/* ── Toast ────────────────────────────────────────────────── */
+.toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--green);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 24px;
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    transition: opacity 0.3s;
+    z-index: 999;
+}
+
+.toast.hidden { opacity: 0; pointer-events: none; }

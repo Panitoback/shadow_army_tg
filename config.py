@@ -9,6 +9,9 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 # Database
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+# Public URL for webhook and webapp (e.g. https://xxxx.ngrok.io)
+PUBLIC_URL = os.getenv("PUBLIC_URL")
+
 # Game settings
 COLLECTION_TIMES = {
     "wood": 3600,    # 1 hour in seconds

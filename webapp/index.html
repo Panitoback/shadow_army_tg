@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ResourceWars</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="app">
+
+        <!-- Header -->
+        <header class="header">
+            <div class="player-info">
+                <span id="player-name">Loading...</span>
+                <span id="player-level">Lv. 1</span>
+            </div>
+            <div class="xp-bar-wrap">
+                <div id="xp-bar" class="xp-bar"></div>
+            </div>
+            <span id="xp-text" class="xp-text">0 / 100 XP</span>
+        </header>
+
+        <!-- Castle -->
+        <section class="castle-section">
+            <img id="castle-img" src="assets/castle.png" alt="Your Castle"
+                 onerror="this.style.display='none'; document.getElementById('castle-placeholder').style.display='flex'">
+            <div id="castle-placeholder" class="castle-placeholder">
+                <span>🏰</span>
+                <p>castle.png</p>
+            </div>
+        </section>
+
+        <!-- Gold display -->
+        <div class="gold-bar">
+            <span>💰 Gold: <strong id="gold-amount">0</strong></span>
+        </div>
+
+        <!-- Resources -->
+        <section class="section">
+            <h2 class="section-title">Resources</h2>
+            <div class="resources-grid" id="resources-grid">
+                <!-- Filled by app.js -->
+            </div>
+        </section>
+
+        <!-- Ranking -->
+        <section class="section">
+            <h2 class="section-title">Ranking</h2>
+            <div id="ranking-list" class="ranking-list">
+                <!-- Filled by app.js -->
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Level up toast -->
+    <div id="toast" class="toast hidden"></div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
