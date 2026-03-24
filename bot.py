@@ -4,10 +4,10 @@ from telegram.ext import ApplicationBuilder
 
 from config import BOT_TOKEN
 from database import init_db
-from handlers.jugador import get_handlers as player_handlers
-from handlers.recursos import get_handlers as resource_handlers
-from handlers.comercio import get_handlers as trading_handlers
-from handlers.batalla import get_handlers as battle_handlers
+from handlers.player import get_handlers as player_handlers
+from handlers.resources import get_handlers as resource_handlers
+from handlers.trading import get_handlers as trading_handlers
+from handlers.battle import get_handlers as battle_handlers
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",

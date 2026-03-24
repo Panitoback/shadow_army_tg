@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Header
 
 from api.auth import validate_init_data
-from services.recursos_service import get_resource_status, start_collection, collect_resource
-from services.jugador_service import add_experience
+from services.resources_service import get_resource_status, start_collection, collect_resource
+from services.player_service import add_experience
 
 router = APIRouter()
 

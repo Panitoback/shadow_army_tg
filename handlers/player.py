@@ -2,7 +2,7 @@ from telegram import Update, WebAppInfo, InlineKeyboardButton, InlineKeyboardMar
 from telegram.ext import ContextTypes, CommandHandler
 
 from config import PUBLIC_URL
-from services.jugador_service import register_user, get_user, get_xp_for_level, get_ranking
+from services.player_service import register_user, get_user, get_xp_for_level, get_ranking
 
 
 async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):

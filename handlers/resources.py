@@ -1,8 +1,8 @@
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes, CommandHandler, CallbackQueryHandler
 
-from services.recursos_service import get_resource_status, start_collection, collect_resource
-from services.jugador_service import add_experience, get_user, get_inventory
+from services.resources_service import get_resource_status, start_collection, collect_resource
+from services.player_service import add_experience, get_user, get_inventory
 
 RESOURCE_NAMES = {
     "wood": "Wood",

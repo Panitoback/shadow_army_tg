@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Header, HTTPException
 
 from api.auth import validate_init_data
-from services.jugador_service import get_user, get_inventory, get_ranking, register_user
+from services.player_service import get_user, get_inventory, get_ranking, register_user
 
 router = APIRouter()
 
