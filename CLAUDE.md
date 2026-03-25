@@ -42,7 +42,7 @@ handlers/ (comandos Telegram) ──┐
 api/routes/ (REST API webapp)  ──┘
 ```
 
-- **`handlers/`**: Comandos del bot (`/start`, `/profile`, `/ranking`). Llaman a los services.
+- **`handlers/`**: Comandos del bot (`/start`, `/profile`, `/ranking`, `/collect`, `/inventory`). Llaman a los services.
 - **`api/routes/`**: Endpoints REST usados por la webapp (`/api/player/me`, `/api/resources/*`). Toda petición requiere el header `x-init-data` con el initData de Telegram, validado por HMAC-SHA256 en `api/auth.py`.
 - **`services/`**: Lógica pura sin dependencias de HTTP ni Telegram. Los módulos `trading_service.py` y `battle_service.py` son stubs pendientes de implementar. `game_service.py` existe pero está vacío. `scheduler.py` tiene el setup de APScheduler pero aún no conecta jobs reales.
 - **`config.py`**: Centraliza tiempos de recolección y cantidades por recurso.

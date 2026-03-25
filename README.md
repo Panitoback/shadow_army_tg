@@ -110,11 +110,13 @@ market_offers       -- player sell offers (status: active | sold | cancelled)
 - Level up is automatic, shown as a toast notification in the UI
 
 ### Bot Commands
-| Command      | Description                           |
-|--------------|---------------------------------------|
-| `/start`     | Register and open the Mini App        |
-| `/profile`   | View level and XP (text fallback)     |
-| `/ranking`   | Top 10 players (text fallback)        |
+| Command      | Description                                        |
+|--------------|----------------------------------------------------|
+| `/start`     | Register and open the Mini App                     |
+| `/profile`   | View level and XP (text fallback)                  |
+| `/ranking`   | Top 10 players (text fallback)                     |
+| `/collect`   | Open resource collection menu (inline keyboard)    |
+| `/inventory` | View current inventory and resources               |
 
 ---
 
