@@ -54,9 +54,6 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(player.router, prefix="/api")
 app.include_router(resources.router, prefix="/api")
 
-# Serve the frontend
-app.mount("/", StaticFiles(directory="webapp", html=True), name="webapp")
-
 
 @app.post("/webhook")
 async def webhook(request: Request):
@@ -64,6 +61,10 @@ async def webhook(request: Request):
     update = Update.de_json(data, bot_app.bot)
     await bot_app.process_update(update)
     return {"ok": True}
+
+
+# Serve the frontend (must be last — catches all remaining routes)
+app.mount("/", StaticFiles(directory="webapp", html=True), name="webapp")
 
 
 if __name__ == "__main__":

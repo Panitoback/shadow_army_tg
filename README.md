@@ -24,9 +24,10 @@ A resource trading game built as a Telegram Mini App. Players manage a castle, c
 ```
 juego_telegram/
 ├── main.py                     # Entry point — FastAPI app + webhook + static files
+├── bot.py                      # Polling alternative (development without ngrok)
 ├── config.py                   # Environment variables and game constants
 ├── database.py                 # DB connection and schema initialization
-├── scheduler.py                # Background task scheduler (APScheduler)
+├── scheduler.py                # [NOT CONNECTED] APScheduler setup stub at root
 │
 ├── api/                        # REST API layer
 │   ├── auth.py                 # Telegram initData validation (HMAC-SHA256)
@@ -45,8 +46,12 @@ juego_telegram/
 ├── services/                   # Business logic (no Telegram, no HTTP)
 │   ├── player_service.py       # User registration, XP, level-up, ranking
 │   ├── resources_service.py    # Collection timers, resource gathering
+│   ├── scheduler.py            # [NOT CONNECTED] APScheduler setup (notification jobs pending)
+│   ├── game_service.py         # [EMPTY] Reserved for future cross-domain logic
 │   ├── trading_service.py      # [PENDING] Market offers, transfers
 │   └── battle_service.py       # [PENDING] Combat resolution
+│
+├── modules/                    # [UNUSED] Legacy player/resources stubs
 │
 └── webapp/                     # Frontend Mini App
     ├── index.html              # Main UI
@@ -54,7 +59,7 @@ juego_telegram/
     ├── js/
     │   ├── api.js              # API calls with Telegram auth headers
     │   └── app.js              # UI rendering, timers, interactions
-    └── assets/                 # Your PNG files go here (castle, resources)
+    └── assets/                 # PNG files (castle, resources) — emoji fallback if missing
 ```
 
 **Architecture rule:** handlers translate Telegram input → call services. API routes validate initData → call services. Services never touch Telegram or HTTP.
@@ -123,9 +128,8 @@ pip install -r requirements.txt
 ```
 
 ### 2. Configure environment
-```bash
-cp .env.example .env
-```
+
+Create a `.env` file in the project root:
 
 `.env` format:
 ```
@@ -181,4 +185,4 @@ The app shows emoji fallbacks automatically if files are missing.
 - [x] Player ranking
 - [ ] Trading module
 - [ ] Battle module
-- [ ] Push notifications when collection is ready (scheduler)
+- [ ] Push notifications when collection is ready (scheduler not connected yet)

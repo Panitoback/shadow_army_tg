@@ -42,11 +42,13 @@ handlers/ (comandos Telegram) ──┐
 api/routes/ (REST API webapp)  ──┘
 ```
 
-- **`handlers/`**: Comandos del bot (`/start`, `/collect`, `/inventory`, `/ranking`). Llaman a los services.
+- **`handlers/`**: Comandos del bot (`/start`, `/profile`, `/ranking`). Llaman a los services.
 - **`api/routes/`**: Endpoints REST usados por la webapp (`/api/player/me`, `/api/resources/*`). Toda petición requiere el header `x-init-data` con el initData de Telegram, validado por HMAC-SHA256 en `api/auth.py`.
-- **`services/`**: Lógica pura sin dependencias de HTTP ni Telegram. Los módulos `trading_service.py` y `battle_service.py` son stubs pendientes de implementar.
+- **`services/`**: Lógica pura sin dependencias de HTTP ni Telegram. Los módulos `trading_service.py` y `battle_service.py` son stubs pendientes de implementar. `game_service.py` existe pero está vacío. `scheduler.py` tiene el setup de APScheduler pero aún no conecta jobs reales.
 - **`config.py`**: Centraliza tiempos de recolección y cantidades por recurso.
+- **`scheduler.py`** (raíz): Setup alternativo de APScheduler — no importado por `main.py`, pendiente de integrar.
 - **`main.py`**: Entry point principal. Inicializa DB, registra handlers, configura webhook, monta `webapp/` como archivos estáticos.
+- **`bot.py`**: Modo polling (alternativa sin webhook). Útil para desarrollo local sin ngrok.
 
 ### Frontend (webapp/)
 
@@ -62,4 +64,7 @@ XP necesario para subir de nivel = `nivel_actual × 100`. Los recursos otorgan X
 
 ## Módulos pendientes
 
-`handlers/trading.py`, `handlers/battle.py` y sus respectivos services son archivos esqueleto sin implementación. El módulo `modules/` parece sin uso activo.
+- `handlers/trading.py`, `handlers/battle.py` y sus services respectivos son stubs sin implementación.
+- `scheduler.py` (raíz) y `services/scheduler.py` existen pero no están integrados en `main.py` — las notificaciones de timer siguen pendientes.
+- `services/game_service.py` es un archivo vacío.
+- `modules/` (con `player.py` y `resources.py`) no es importado en ningún lugar del código activo.
