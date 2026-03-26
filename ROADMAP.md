@@ -1,6 +1,6 @@
 # ResourceWars — Roadmap
 
-Estado a fecha 2026-03-24. Cada fase depende de la anterior.
+Estado a fecha 2026-03-26. Cada fase depende de la anterior.
 
 ---
 
@@ -21,54 +21,34 @@ Todo lo de esta fase está implementado y funcionando.
 
 ---
 
-## Fase 2 — Notificaciones de temporizador ⬜ PENDIENTE
+## Fase 2 — Notificaciones de temporizador ✅ COMPLETA
 
 **Objetivo:** avisar al jugador cuando su recurso está listo para recolectar, sin que tenga que abrir el juego.
 
-**Archivos a modificar/completar:**
-- `services/scheduler.py` — añadir el job que revise `collection_timers`
-- `main.py` — inicializar y arrancar el scheduler en el `lifespan`
-- `scheduler.py` (raíz) — puede eliminarse o fusionarse con `services/scheduler.py`
-
-**Pasos:**
-1. En `services/scheduler.py`, crear un job que se ejecute cada minuto
-2. El job consulta `collection_timers` donde `ends_at <= now` y no se ha notificado
-3. Envía mensaje de Telegram al usuario con `bot_app.bot.send_message()`
-4. Añadir columna `notified` (boolean) a `collection_timers` para no notificar dos veces
-5. Integrar el scheduler en `lifespan` de `main.py`
+- [x] Columna `notified BOOLEAN DEFAULT FALSE` añadida a `collection_timers` (con `ALTER TABLE ADD COLUMN IF NOT EXISTS` para tablas existentes)
+- [x] `services/scheduler.py` — job que corre cada minuto, consulta `ends_at <= now AND notified = FALSE`, envía mensaje de Telegram, marca `notified = TRUE`; maneja usuarios que bloquearon el bot sin romper
+- [x] Scheduler integrado en el `lifespan` de `main.py` — arranca tras el bot, se apaga limpiamente en shutdown
+- [x] `scheduler.py` de la raíz eliminado (era un stub sin lógica ni imports)
 
 ---
 
-## Fase 3 — Sistema de comercio (Trading) ⬜ PENDIENTE
+## Fase 3 — Sistema de comercio (Trading) ✅ COMPLETA
 
 **Objetivo:** los jugadores pueden publicar ofertas de venta y comprar recursos de otros.
 
-**Archivos a completar:**
-- `services/trading_service.py` — lógica completa
-- `handlers/trading.py` — comandos de bot
-- `api/routes/` — endpoints REST para la webapp
+- [x] `services/trading_service.py` — 4 funciones con transacciones atómicas:
+  - `create_offer` — valida stock, descuenta inventario, inserta en `market_offers`
+  - `cancel_offer` — devuelve recurso al inventario, marca como `cancelled`
+  - `get_active_offers` — lista todas las ofertas activas con username del vendedor
+  - `buy_offer` — valida gold, transfiere recursos y gold entre jugadores, registra en `transactions`, marca como `sold`
+- [x] `handlers/trading.py` — `/market`, `/sell <recurso> <cantidad> <precio>`, `/buy <id>`, `/cancel <id>`
+- [x] `api/routes/market.py` — `GET /api/market`, `POST /api/market/sell`, `POST /api/market/buy/{id}`, `DELETE /api/market/{id}`
+- [x] Frontend: pestaña "Market" con formulario de venta, lista de ofertas activas, botón Buy/Cancel según si es tuya o ajena
 
-**Pasos:**
-1. **`services/trading_service.py`**
-   - `create_offer(user_id, resource, amount, gold_price)` — valida que el jugador tenga suficiente recurso, descuenta del inventario, inserta en `market_offers`
-   - `cancel_offer(user_id, offer_id)` — devuelve el recurso al inventario, marca oferta como `cancelled`
-   - `get_active_offers()` — lista todas las ofertas activas
-   - `buy_offer(buyer_id, offer_id)` — valida gold del comprador, transfiere recursos y gold, registra en `transactions`, marca oferta como `sold`
-
-2. **`handlers/trading.py`**
-   - `/market` — muestra lista de ofertas activas
-   - `/sell <recurso> <cantidad> <precio_gold>` — crea una oferta
-   - `/buy <offer_id>` — acepta una oferta
-   - `/cancel <offer_id>` — cancela tu propia oferta
-
-3. **API REST (webapp)**
-   - `GET /api/market` — listar ofertas activas
-   - `POST /api/market/sell` — crear oferta
-   - `POST /api/market/buy/{offer_id}` — comprar
-   - `DELETE /api/market/{offer_id}` — cancelar
-
-4. **Frontend**
-   - Pestaña "Market" en la webapp con listado de ofertas e interfaz de compra/venta
+**Mejoras de frontend implementadas también en esta fase:**
+- [x] Navegación por tabs (Resources / Market / Ranking) — elimina el scroll largo
+- [x] Countdown client-side sin parpadeo: `tickCountdown()` actualiza solo el texto del botón; re-render completo solo al pasar a "ready"
+- [x] Server poll cada 10s solo para sincronizar estado real; countdown local cada 1s sin requests
 
 ---
 
@@ -110,12 +90,13 @@ Todo lo de esta fase está implementado y funcionando.
 
 **Pasos:**
 1. Eliminar o integrar `modules/` (actualmente sin uso)
-2. Eliminar `scheduler.py` de la raíz (duplicado de `services/scheduler.py`)
+2. ~~Eliminar `scheduler.py` de la raíz~~ ✅ Ya hecho en Fase 2
 3. Crear `.env.example` con todas las variables requeridas
 4. Añadir manejo de errores global en FastAPI (handlers de excepciones)
 5. Revisar que todas las rutas API devuelvan mensajes de error consistentes
-6. Añadir validación de parámetros en los endpoints REST (Pydantic models)
+6. Añadir validación de parámetros en los endpoints REST (Pydantic models — ya en market, extender a resources)
 7. Añadir índices a la base de datos (`user_id` en `collection_timers`, `market_offers`)
+8. Añadir sistema de migraciones (Alembic) para gestionar cambios de esquema en producción
 
 ---
 
@@ -139,8 +120,8 @@ Todo lo de esta fase está implementado y funcionando.
 | Fase | Descripción              | Estado       |
 |------|--------------------------|--------------|
 | 1    | Núcleo jugable           | ✅ Completa   |
-| 2    | Notificaciones scheduler | ⬜ Pendiente  |
-| 3    | Sistema de comercio      | ⬜ Pendiente  |
+| 2    | Notificaciones scheduler | ✅ Completa   |
+| 3    | Sistema de comercio      | ✅ Completa   |
 | 4    | Sistema de batallas      | ⬜ Pendiente  |
 | 5    | Limpieza y calidad       | ⬜ Pendiente  |
 | 6    | Despliegue producción    | ⬜ Futuro     |

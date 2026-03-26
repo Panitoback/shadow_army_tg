@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>ResourceWars</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=3">
 </head>
 <body>
     <div id="app">
@@ -22,43 +22,70 @@
             <span id="xp-text" class="xp-text">0 / 100 XP</span>
         </header>
 
-        <!-- Castle -->
-        <section class="castle-section">
-            <img id="castle-img" src="assets/castle.png" alt="Your Castle"
-                 onerror="this.style.display='none'; document.getElementById('castle-placeholder').style.display='flex'">
-            <div id="castle-placeholder" class="castle-placeholder">
-                <span>🏰</span>
-                <p>castle.png</p>
-            </div>
-        </section>
+        <!-- Tab navigation -->
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="resources">Resources</button>
+            <button class="tab-btn" data-tab="market">Market</button>
+            <button class="tab-btn" data-tab="ranking">Ranking</button>
+        </nav>
 
-        <!-- Gold display -->
-        <div class="gold-bar">
-            <span>💰 Gold: <strong id="gold-amount">0</strong></span>
+        <!-- Resources tab -->
+        <div class="tab-content active" id="tab-resources">
+            <section class="castle-section">
+                <img id="castle-img" src="assets/castle.png" alt="Your Castle"
+                     onerror="this.style.display='none'; document.getElementById('castle-placeholder').style.display='flex'">
+                <div id="castle-placeholder" class="castle-placeholder">
+                    <span>🏰</span>
+                    <p>castle.png</p>
+                </div>
+            </section>
+
+            <div class="gold-bar">
+                <span>💰 Gold: <strong id="gold-amount">0</strong></span>
+            </div>
+
+            <section class="section">
+                <div class="resources-grid" id="resources-grid">
+                    <!-- Filled by app.js -->
+                </div>
+            </section>
         </div>
 
-        <!-- Resources -->
-        <section class="section">
-            <h2 class="section-title">Resources</h2>
-            <div class="resources-grid" id="resources-grid">
-                <!-- Filled by app.js -->
-            </div>
-        </section>
+        <!-- Market tab -->
+        <div class="tab-content" id="tab-market">
+            <section class="section">
+                <div class="market-sell-form">
+                    <select id="sell-resource">
+                        <option value="wood">Wood</option>
+                        <option value="stone">Stone</option>
+                        <option value="water">Water</option>
+                        <option value="food">Food</option>
+                    </select>
+                    <input id="sell-amount" type="number" min="1" placeholder="Amount">
+                    <input id="sell-price" type="number" min="1" placeholder="Gold price">
+                    <button id="sell-btn" class="btn-sell">Sell</button>
+                </div>
+                <div id="market-list" class="market-list">
+                    <!-- Filled by app.js -->
+                </div>
+            </section>
+        </div>
 
-        <!-- Ranking -->
-        <section class="section">
-            <h2 class="section-title">Ranking</h2>
-            <div id="ranking-list" class="ranking-list">
-                <!-- Filled by app.js -->
-            </div>
-        </section>
+        <!-- Ranking tab -->
+        <div class="tab-content" id="tab-ranking">
+            <section class="section">
+                <div id="ranking-list" class="ranking-list">
+                    <!-- Filled by app.js -->
+                </div>
+            </section>
+        </div>
 
     </div>
 
-    <!-- Level up toast -->
+    <!-- Toast -->
     <div id="toast" class="toast hidden"></div>
 
-    <script src="js/api.js"></script>
-    <script src="js/app.js"></script>
+    <script src="js/api.js?v=3"></script>
+    <script src="js/app.js?v=3"></script>
 </body>
 </html>

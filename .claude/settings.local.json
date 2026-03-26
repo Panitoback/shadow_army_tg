@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 -c \":*)",
+      "Bash(find /c/Users/User/Desktop/juego_telegram -maxdepth 2 -not -path */.venv/* -not -path */.git/* -not -path */node_modules/*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}

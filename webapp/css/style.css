@@ -78,6 +78,37 @@ body {
     color: var(--text-muted);
 }
 
+/* ── Tabs ─────────────────────────────────────────────────── */
+.tabs {
+    display: flex;
+    background: var(--surface);
+    border-radius: var(--radius);
+    padding: 4px;
+    margin-bottom: 16px;
+    gap: 4px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+}
+
+.tab-btn.active {
+    background: var(--card);
+    color: var(--text);
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
 /* ── Castle ───────────────────────────────────────────────── */
 .castle-section {
     display: flex;
@@ -190,6 +221,98 @@ body {
 .btn-idle    { background: var(--accent);  color: #fff; }
 .btn-ready   { background: var(--green);   color: #fff; }
 .btn-waiting { background: var(--surface); color: var(--text-muted); cursor: default; }
+
+/* ── Market ───────────────────────────────────────────────── */
+.market-sell-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.market-sell-form select,
+.market-sell-form input {
+    background: var(--card);
+    border: 1px solid var(--surface);
+    border-radius: 8px;
+    color: var(--text);
+    padding: 8px 10px;
+    font-size: 14px;
+    width: 100%;
+}
+
+.btn-sell {
+    grid-column: 1 / -1;
+    background: var(--gold);
+    color: #1a1a2e;
+    border: none;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.btn-sell:active { opacity: 0.8; }
+
+.market-list { display: flex; flex-direction: column; gap: 8px; }
+
+.market-item {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.market-item-info { flex: 1; }
+
+.market-item-title {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.market-item-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 2px;
+}
+
+.market-price {
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.btn-buy {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+}
+
+.btn-buy:active  { opacity: 0.8; }
+.btn-buy:disabled { background: var(--surface); color: var(--text-muted); cursor: default; }
+
+.btn-cancel-offer {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--surface);
+    border-radius: 8px;
+    padding: 7px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
 
 /* ── Ranking ──────────────────────────────────────────────── */
 .ranking-list { display: flex; flex-direction: column; gap: 8px; }

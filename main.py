@@ -13,7 +13,8 @@ from handlers.player import get_handlers as player_handlers
 from handlers.resources import get_handlers as resource_handlers
 from handlers.trading import get_handlers as trading_handlers
 from handlers.battle import get_handlers as battle_handlers
-from api.routes import player, resources
+from api.routes import player, resources, market
+from services.scheduler import setup_scheduler
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -41,9 +42,12 @@ async def lifespan(app: FastAPI):
     await bot_app.start()
     logging.info("Bot started with webhook.")
 
+    scheduler = setup_scheduler(bot_app.bot)
+
     yield
 
     # Shutdown
+    scheduler.shutdown()
     await bot_app.stop()
     logging.info("Bot stopped.")
 
@@ -53,6 +57,7 @@ app = FastAPI(lifespan=lifespan)
 # REST API routes
 app.include_router(player.router, prefix="/api")
 app.include_router(resources.router, prefix="/api")
+app.include_router(market.router, prefix="/api")
 
 
 @app.post("/webhook")

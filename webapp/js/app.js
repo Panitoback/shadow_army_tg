@@ -14,7 +14,22 @@ const RESOURCES = [
 ];
 
 let inventoryCache = {};
+let statusCache = {};
+let countdownInterval = null;
 let pollInterval = null;
+
+// ── Tabs ───────────────────────────────────────────────────
+
+function initTabs() {
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+            document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+            btn.classList.add("active");
+            document.getElementById(`tab-${btn.dataset.tab}`).classList.add("active");
+        });
+    });
+}
 
 // ── Helpers ────────────────────────────────────────────────
 
@@ -113,6 +128,43 @@ function renderRanking(ranking) {
     });
 }
 
+function renderMarket(offers) {
+    const list = document.getElementById("market-list");
+    list.innerHTML = "";
+
+    if (offers.length === 0) {
+        list.innerHTML = `<p style="color:var(--text-muted);font-size:13px;">No active offers.</p>`;
+        return;
+    }
+
+    const LABELS = { wood: "Wood", stone: "Stone", water: "Water", food: "Food" };
+
+    offers.forEach(({ id, seller, resource, amount, price_gold, is_mine }) => {
+        const label = LABELS[resource] ?? resource;
+        const item = document.createElement("div");
+        item.className = "market-item";
+        item.innerHTML = `
+            <div class="market-item-info">
+                <div class="market-item-title">${label} x${amount}</div>
+                <div class="market-item-sub">by ${seller}</div>
+            </div>
+            <span class="market-price">${price_gold}g</span>
+            ${is_mine
+                ? `<button class="btn-cancel-offer" data-offer-id="${id}">Cancel</button>`
+                : `<button class="btn-buy" data-offer-id="${id}">Buy</button>`
+            }
+        `;
+        list.appendChild(item);
+    });
+
+    list.querySelectorAll(".btn-buy").forEach(btn => {
+        btn.addEventListener("click", () => handleBuy(btn));
+    });
+    list.querySelectorAll(".btn-cancel-offer").forEach(btn => {
+        btn.addEventListener("click", () => handleCancelOffer(btn));
+    });
+}
+
 // ── Actions ────────────────────────────────────────────────
 
 async function handleResourceClick(btn) {
@@ -144,26 +196,126 @@ async function handleResourceClick(btn) {
     }
 }
 
+async function handleBuy(btn) {
+    const offerId = btn.dataset.offerId;
+    btn.disabled = true;
+    try {
+        const result = await Api.buyOffer(offerId);
+        if (result.bought) {
+            const LABELS = { wood: "Wood", stone: "Stone", water: "Water", food: "Food" };
+            showToast(`Bought ${result.amount} ${LABELS[result.resource] ?? result.resource} for ${result.price_gold}g!`);
+            await refresh();
+        } else {
+            showToast(result.error ?? "Purchase failed", "#e94560");
+            btn.disabled = false;
+        }
+    } catch (err) {
+        console.error(err);
+        btn.disabled = false;
+    }
+}
+
+async function handleCancelOffer(btn) {
+    const offerId = btn.dataset.offerId;
+    btn.disabled = true;
+    try {
+        const result = await Api.cancelOffer(offerId);
+        if (result.cancelled) {
+            showToast("Offer cancelled. Resources returned.");
+            await refresh();
+        } else {
+            showToast(result.error ?? "Cancel failed", "#e94560");
+            btn.disabled = false;
+        }
+    } catch (err) {
+        console.error(err);
+        btn.disabled = false;
+    }
+}
+
+async function handleSell() {
+    const resource   = document.getElementById("sell-resource").value;
+    const amount     = parseInt(document.getElementById("sell-amount").value);
+    const price_gold = parseInt(document.getElementById("sell-price").value);
+
+    if (!amount || !price_gold || amount <= 0 || price_gold <= 0) {
+        showToast("Enter a valid amount and price.", "#e94560");
+        return;
+    }
+
+    const btn = document.getElementById("sell-btn");
+    btn.disabled = true;
+    try {
+        const result = await Api.sellOffer(resource, amount, price_gold);
+        if (result.created) {
+            document.getElementById("sell-amount").value = "";
+            document.getElementById("sell-price").value = "";
+            showToast(`Offer #${result.offer_id} created!`);
+            await refresh();
+        } else {
+            showToast(result.error ?? "Could not create offer", "#e94560");
+        }
+    } catch (err) {
+        console.error(err);
+    } finally {
+        btn.disabled = false;
+    }
+}
+
 // ── Data loading ───────────────────────────────────────────
 
 async function refresh() {
-    const [profile, status, ranking] = await Promise.all([
+    const [profile, status, ranking, offers] = await Promise.all([
         Api.getProfile(),
         Api.getResourceStatus(),
         Api.getRanking(),
+        Api.getMarket(),
     ]);
     renderProfile(profile);
-    renderResources(status);
+    statusCache = status;
+    renderResources(statusCache);
     renderRanking(ranking);
+    renderMarket(offers);
+}
+
+function tickCountdown() {
+    let stateChanged = false;
+    for (const key in statusCache) {
+        if (typeof statusCache[key] === "number" && statusCache[key] > 0) {
+            statusCache[key] -= 1;
+            if (statusCache[key] <= 0) {
+                statusCache[key] = "ready";
+                stateChanged = true;
+            }
+        }
+    }
+    if (stateChanged) {
+        // Full re-render only when a timer just turned "ready"
+        renderResources(statusCache);
+    } else {
+        // Lightweight: only update the button text, images stay untouched
+        document.querySelectorAll(".resource-btn.btn-waiting").forEach(btn => {
+            const val = statusCache[btn.dataset.resource];
+            if (typeof val === "number") {
+                btn.textContent = formatTime(val);
+                btn.dataset.state = val;
+            }
+        });
+    }
 }
 
 async function init() {
     try {
+        initTabs();
+        document.getElementById("sell-btn").addEventListener("click", handleSell);
         await refresh();
-        // Poll every 10s to update timers automatically
+        // Decrement timers locally every second (no server request)
+        countdownInterval = setInterval(tickCountdown, 1000);
+        // Sync with server every 10s to catch real state changes
         pollInterval = setInterval(async () => {
             const status = await Api.getResourceStatus();
-            renderResources(status);
+            statusCache = status;
+            renderResources(statusCache);
         }, 10000);
     } catch (err) {
         console.error("Failed to load game data:", err);

@@ -37,8 +37,15 @@ def init_db():
             user_id BIGINT REFERENCES users(id),
             resource TEXT,
             ends_at TIMESTAMP,
+            notified BOOLEAN DEFAULT FALSE,
             PRIMARY KEY (user_id, resource)
         )
+    """)
+
+    # Add notified column to existing tables that were created without it
+    cur.execute("""
+        ALTER TABLE collection_timers
+        ADD COLUMN IF NOT EXISTS notified BOOLEAN DEFAULT FALSE
     """)
 
     # status: pending | completed | cancelled
