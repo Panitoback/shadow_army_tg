@@ -44,6 +44,21 @@ def get_user(user_id: int):
         conn.close()
 
 
+def get_user_by_username(username: str):
+    """Returns (id, username, level, experience) or None. Case-insensitive lookup."""
+    conn = get_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute(
+            "SELECT id, username, level, experience FROM users WHERE LOWER(username) = LOWER(%s)",
+            (username,)
+        )
+        return cur.fetchone()
+    finally:
+        cur.close()
+        conn.close()
+
+
 def get_inventory(user_id: int):
     """Returns (wood, stone, water, food, gold) or None."""
     conn = get_connection()

@@ -46,15 +46,15 @@ juego_telegram/
 │   ├── resources.py            # /collect  /inventory
 │   │                           # CallbackQueryHandler: collect_start:* collect_take:* collect_wait:*
 │   ├── trading.py              # /market  /sell  /buy  /cancel
-│   └── battle.py               # [PENDING] /attack  /defense  /history
+│   └── battle.py               # /attack <username>  /defense  /history
 │
 ├── services/                   # Business logic (no Telegram, no HTTP)
-│   ├── player_service.py       # register_user, get_user, get_inventory, add_experience, get_ranking
+│   ├── player_service.py       # register_user, get_user, get_user_by_username, get_inventory, add_experience, get_ranking
 │   ├── resources_service.py    # get_resource_status, start_collection, collect_resource
 │   ├── trading_service.py      # create_offer, cancel_offer, get_active_offers, buy_offer
 │   ├── scheduler.py            # setup_scheduler() — notify_ready_timers job (every 1 min)
 │   ├── game_service.py         # [EMPTY] Reserved for future cross-domain logic
-│   └── battle_service.py       # [PENDING] Combat resolution, loot calculation
+│   └── battle_service.py       # calculate_power, resolve_battle, apply_loot, get_battle_history
 │
 ├── modules/                    # [UNUSED] Three empty files — not imported anywhere
 │
@@ -154,6 +154,9 @@ When a timer expires, the APScheduler job sends a Telegram notification to the p
 | `/sell <resource> <amount> <price>` | Create a sell offer |
 | `/buy <offer_id>` | Buy an active offer |
 | `/cancel <offer_id>` | Cancel your own offer |
+| `/attack <username>` | Attack another player |
+| `/defense` | View your combat power breakdown |
+| `/history` | View your last 20 battles |
 
 ---
 
@@ -200,11 +203,13 @@ The app shows emoji fallbacks automatically if files are missing.
 
 ## Planned Modules
 
-### Battle System (next)
-- Attack power derived from level + inventory
-- Winner steals a portion of loser's resources
-- Bot commands: `/attack <username>`, `/defense`, `/history`
-- Battle tab in the Mini App with power ranking, attack button, and history
+### Battle System (in progress)
+- Attack power = `level × 10 + weighted_resources // 2` (stone=2pts, others=1pt)
+- ±20% random factor per fight — higher power wins, but not guaranteed
+- Winner steals 20% of each of the loser's resources (atomic transfer)
+- Service layer complete
+- Bot commands complete: `/attack <username>`, `/defense`, `/history`
+- Pending: REST API endpoints and Battle tab in the Mini App
 
 ---
 
@@ -223,4 +228,7 @@ The app shows emoji fallbacks automatically if files are missing.
 - [x] Gold inventory (starts at 100 per player)
 - [x] APScheduler notifications when collection timer expires
 - [x] Trading module (create/cancel/list/buy offers, atomic transfers)
-- [ ] Battle module
+- [x] Battle service (`calculate_power`, `resolve_battle`, `apply_loot`, `get_battle_history`)
+- [x] Battle handlers (`/attack`, `/defense`, `/history`)
+- [ ] Battle REST API (`POST /api/battle/attack`, `GET /api/battle/history`, `GET /api/battle/power`)
+- [ ] Battle frontend tab (power ranking, attack button, history)

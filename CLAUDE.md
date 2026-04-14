@@ -50,7 +50,7 @@ api/routes/ (REST API webapp)  ──┘
   - `player.py`: registra `/start`, `/profile`, `/ranking`
   - `resources.py`: registra `/collect`, `/inventory` y un `CallbackQueryHandler` para los patrones `collect_start:*`, `collect_take:*`, `collect_wait:*`
   - `trading.py`: registra `/market`, `/sell`, `/buy`, `/cancel`
-  - `battle.py`: stub vacío, `get_handlers()` retorna `[]`
+  - `battle.py`: registra `/attack <username>`, `/defense`, `/history`
 
 - **`api/routes/`**: Endpoints REST usados por la webapp. Toda petición protegida requiere el header `x-init-data` con el initData de Telegram, validado por HMAC-SHA256 en `api/auth.py`. **Excepciones:** `GET /api/ranking` es público sin autenticación. `GET /api/player/me` auto-registra al usuario si no existe.
   - `player.py`: `GET /api/player/me`, `GET /api/ranking`
@@ -58,11 +58,11 @@ api/routes/ (REST API webapp)  ──┘
   - `market.py`: `GET /api/market`, `POST /api/market/sell` (body: `SellRequest` Pydantic), `POST /api/market/buy/{offer_id}`, `DELETE /api/market/{offer_id}`
 
 - **`services/`**: Lógica pura sin dependencias de HTTP ni Telegram.
-  - `player_service.py`: `register_user`, `get_user`, `get_inventory`, `add_experience` (soporta múltiples level-ups en bucle while), `get_ranking`
+  - `player_service.py`: `register_user`, `get_user`, `get_user_by_username` (case-insensitive), `get_inventory`, `add_experience` (soporta múltiples level-ups en bucle while), `get_ranking`
   - `resources_service.py`: `get_resource_status`, `start_collection`, `collect_resource`. Usa `psycopg2.sql.Identifier` para inyectar el nombre de columna del recurso de forma segura en las queries UPDATE.
   - `trading_service.py`: `create_offer`, `cancel_offer`, `get_active_offers`, `buy_offer`. Todas las transferencias de recursos/gold son atómicas. Usa `sql.Identifier` para columnas de recurso. `get_active_offers` retorna `(id, seller_id, username, resource, amount, price_gold)`.
   - `scheduler.py`: `setup_scheduler(bot)` — configura `AsyncIOScheduler` con job `notify_ready_timers` cada 1 minuto. El job consulta `collection_timers WHERE ends_at <= now AND notified = FALSE`, envía mensaje por Telegram, marca `notified = TRUE`. Falla silenciosamente si el usuario bloqueó el bot.
-  - `battle_service.py`: stub de comentarios, pendiente de implementar.
+  - `battle_service.py`: `calculate_power`, `resolve_battle`, `_apply_loot`, `_record_battle`, `get_battle_history`. Fórmula de poder: `nivel × 10 + suma_ponderada_recursos // 2` (stone=2pts, resto=1pt). Factor aleatorio ±20% en cada combate. El ganador roba el 20% de cada recurso del perdedor. Todo el combate + loot + registro en una sola transacción atómica. `get_battle_history` retorna las últimas 20 batallas con JOIN a usernames.
   - `game_service.py`: archivo vacío reservado.
 
 - **`config.py`**: Centraliza tiempos de recolección (`COLLECTION_TIMES`) y cantidades por recurso (`COLLECTION_AMOUNTS`).
@@ -136,6 +136,7 @@ Cubre: `.env`, `.env.*`, `.venv/`, `__pycache__/`, `*.pyc`, `*.pyo`.
 
 ## Módulos pendientes
 
-- `handlers/battle.py` y `services/battle_service.py` — stubs de comentarios sin lógica. Siguiente fase.
+- `api/routes/battle.py` — no existe aún. Pendiente: `POST /api/battle/attack`, `GET /api/battle/history`, `GET /api/battle/power`.
+- Frontend — pestaña "Battle" en `webapp/` pendiente: ranking de poder, botón de ataque, historial.
 - `services/game_service.py` — archivo vacío reservado para lógica cross-domain futura.
 - `modules/` (`player.py`, `resources.py`, `__init__.py`) — los tres archivos están vacíos, no son importados en ningún lugar del código activo. Candidatos a eliminar en Fase 5.

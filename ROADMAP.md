@@ -52,35 +52,19 @@ Todo lo de esta fase está implementado y funcionando.
 
 ---
 
-## Fase 4 — Sistema de batallas (Battle) ⬜ PENDIENTE
+## Fase 4 — Sistema de batallas (Battle) 🔄 EN PROGRESO (1/3)
 
 **Objetivo:** los jugadores pueden atacar a otros, el ganador roba recursos.
 
-**Archivos a completar:**
-- `services/battle_service.py` — lógica completa
-- `handlers/battle.py` — comandos de bot
-- `api/routes/` — endpoints REST para la webapp
-
-**Pasos:**
-1. **`services/battle_service.py`**
-   - `calculate_power(user_id)` — poder de ataque/defensa basado en nivel e inventario
-   - `resolve_battle(attacker_id, defender_id)` — compara poderes, determina ganador
-   - `apply_loot(winner_id, loser_id)` — transfiere un porcentaje de recursos al ganador
-   - `record_battle(attacker_id, defender_id, winner_id, power, loot)` — guarda en `battles`
-   - `get_battle_history(user_id)` — historial de batallas del jugador
-
-2. **`handlers/battle.py`**
-   - `/attack <username>` — atacar a otro jugador
-   - `/defense` — ver tu poder de defensa actual
-   - `/history` — ver historial de tus batallas
-
-3. **API REST (webapp)**
-   - `POST /api/battle/attack` — iniciar ataque
-   - `GET /api/battle/history` — historial
-   - `GET /api/battle/power` — poder actual del jugador
-
-4. **Frontend**
-   - Pestaña "Battle" en la webapp con ranking de poder, botón de ataque e historial
+- [x] **`services/battle_service.py`** — lógica completa implementada:
+  - `calculate_power(user_id)` — poder = `nivel × 10 + suma_ponderada_recursos // 2`
+  - `resolve_battle(attacker_id, defender_id)` — ±20% factor aleatorio, transacción atómica
+  - `_apply_loot` — roba 20% de cada recurso del perdedor, transfiere al ganador
+  - `_record_battle` — guarda en tabla `battles`
+  - `get_battle_history(user_id)` — últimas 20 batallas con JOIN a usernames
+- [x] **`handlers/battle.py`** — `/attack <username>`, `/defense`, `/history`
+- [ ] **`api/routes/battle.py`** — `POST /api/battle/attack`, `GET /api/battle/history`, `GET /api/battle/power`
+- [ ] **Frontend** — pestaña "Battle" con ranking de poder, botón de ataque e historial
 
 ---
 
@@ -122,6 +106,6 @@ Todo lo de esta fase está implementado y funcionando.
 | 1    | Núcleo jugable           | ✅ Completa   |
 | 2    | Notificaciones scheduler | ✅ Completa   |
 | 3    | Sistema de comercio      | ✅ Completa   |
-| 4    | Sistema de batallas      | ⬜ Pendiente  |
+| 4    | Sistema de batallas      | 🔄 En progreso |
 | 5    | Limpieza y calidad       | ⬜ Pendiente  |
 | 6    | Despliegue producción    | ⬜ Futuro     |
