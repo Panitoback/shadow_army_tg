@@ -32,4 +32,7 @@ const Api = {
     },
     buyOffer(id)              { return this._request("POST",   `/api/market/buy/${id}`); },
     cancelOffer(id)           { return this._request("DELETE", `/api/market/${id}`); },
+    getPowerRanking()         { return this._request("GET",    "/api/battle/power"); },
+    getBattleHistory()        { return this._request("GET",    "/api/battle/history"); },
+    attackPlayer(username)    { return this._request("POST",   "/api/battle/attack", { username }); },
 };

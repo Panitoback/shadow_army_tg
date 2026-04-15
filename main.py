@@ -13,7 +13,7 @@ from handlers.player import get_handlers as player_handlers
 from handlers.resources import get_handlers as resource_handlers
 from handlers.trading import get_handlers as trading_handlers
 from handlers.battle import get_handlers as battle_handlers
-from api.routes import player, resources, market
+from api.routes import player, resources, market, battle
 from services.scheduler import setup_scheduler
 
 logging.basicConfig(
@@ -58,6 +58,7 @@ app = FastAPI(lifespan=lifespan)
 app.include_router(player.router, prefix="/api")
 app.include_router(resources.router, prefix="/api")
 app.include_router(market.router, prefix="/api")
+app.include_router(battle.router, prefix="/api")
 
 
 @app.post("/webhook")

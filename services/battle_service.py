@@ -175,6 +175,41 @@ def _record_battle(
     return cur.fetchone()[0]
 
 
+def get_power_ranking() -> list:
+    """
+    Return all players sorted by combat power (descending).
+    Each entry: {user_id, username, level, power}
+    """
+    conn = get_connection()
+    cur = conn.cursor()
+    try:
+        cur.execute(
+            """
+            SELECT u.id, u.username, u.level,
+                   COALESCE(i.wood, 0), COALESCE(i.stone, 0),
+                   COALESCE(i.water, 0), COALESCE(i.food, 0)
+            FROM users u
+            LEFT JOIN inventory i ON i.user_id = u.id
+            """
+        )
+        rows = cur.fetchall()
+        result = []
+        for user_id, username, level, wood, stone, water, food in rows:
+            resource_power = (
+                wood * RESOURCE_POWER_WEIGHTS["wood"]
+                + stone * RESOURCE_POWER_WEIGHTS["stone"]
+                + water * RESOURCE_POWER_WEIGHTS["water"]
+                + food * RESOURCE_POWER_WEIGHTS["food"]
+            )
+            power = level * 10 + resource_power // 2
+            result.append({"user_id": user_id, "username": username, "level": level, "power": power})
+        result.sort(key=lambda x: x["power"], reverse=True)
+        return result
+    finally:
+        cur.close()
+        conn.close()
+
+
 def get_battle_history(user_id: int) -> list:
     """
     Return the last 20 battles where the user was attacker or defender.

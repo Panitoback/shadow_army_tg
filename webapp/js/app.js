@@ -13,6 +13,7 @@ const RESOURCES = [
     { key: "food",  label: "Food",  icon: "assets/food.png",  fallback: "🌾" },
 ];
 
+let myUserId = null;
 let inventoryCache = {};
 let statusCache = {};
 let countdownInterval = null;
@@ -58,6 +59,7 @@ function showToast(message, color = "#4caf50") {
 // ── Render ─────────────────────────────────────────────────
 
 function renderProfile(profile) {
+    myUserId = profile.id;
     document.getElementById("player-name").textContent = profile.username;
     document.getElementById("player-level").textContent = `Lv. ${profile.level}`;
     document.getElementById("gold-amount").textContent = profile.inventory.gold;
@@ -165,6 +167,64 @@ function renderMarket(offers) {
     });
 }
 
+function renderPowerRanking(ranking) {
+    const list = document.getElementById("power-ranking-list");
+    list.innerHTML = "";
+
+    if (ranking.length === 0) {
+        list.innerHTML = `<p style="color:var(--text-muted);font-size:13px;">No players yet.</p>`;
+        return;
+    }
+
+    ranking.forEach(({ user_id, username, level, power }, i) => {
+        const isMe = user_id === myUserId;
+        const item = document.createElement("div");
+        item.className = "power-item";
+        item.innerHTML = `
+            <span class="power-rank">${i + 1}</span>
+            <div class="power-info">
+                <div class="power-username">${username}${isMe ? " (You)" : ""}</div>
+                <div class="power-score">Lv.${level} · ⚔️ ${power} power</div>
+            </div>
+            <button class="btn-attack" data-username="${username}" ${isMe ? "disabled" : ""}>
+                ${isMe ? "You" : "Attack"}
+            </button>
+        `;
+        list.appendChild(item);
+    });
+
+    list.querySelectorAll(".btn-attack:not([disabled])").forEach(btn => {
+        btn.addEventListener("click", () => handleAttack(btn));
+    });
+}
+
+function renderBattleHistory(history) {
+    const list = document.getElementById("battle-history-list");
+    list.innerHTML = "";
+
+    if (history.length === 0) {
+        list.innerHTML = `<p style="color:var(--text-muted);font-size:13px;">No battles yet.</p>`;
+        return;
+    }
+
+    history.forEach(battle => {
+        const won = battle.winner_id === myUserId;
+        const item = document.createElement("div");
+        item.className = "battle-item";
+        item.innerHTML = `
+            <div class="battle-item-header">
+                <span class="${won ? "battle-outcome-win" : "battle-outcome-lose"}">${won ? "WIN" : "LOSS"}</span>
+                <span>${battle.attacker} ⚔️ ${battle.defender}</span>
+            </div>
+            <div class="battle-item-sub">
+                Power: ${battle.attacker_power} vs ${battle.defender_power} ·
+                Stolen: ${battle.resources_stolen} resources
+            </div>
+        `;
+        list.appendChild(item);
+    });
+}
+
 // ── Actions ────────────────────────────────────────────────
 
 async function handleResourceClick(btn) {
@@ -233,6 +293,30 @@ async function handleCancelOffer(btn) {
     }
 }
 
+async function handleAttack(btn) {
+    const username = btn.dataset.username;
+    btn.disabled = true;
+    try {
+        const result = await Api.attackPlayer(username);
+        if (result.error) {
+            showToast(result.error, "#e94560");
+            btn.disabled = false;
+            return;
+        }
+        const won = result.winner_id === myUserId;
+        const stolen = result.resources_stolen;
+        if (won) {
+            showToast(`Victory! Stole ${stolen} resources from ${username}!`);
+        } else {
+            showToast(`Defeat! ${username} stole ${stolen} resources from you.`, "#e94560");
+        }
+        await refresh();
+    } catch (err) {
+        console.error(err);
+        btn.disabled = false;
+    }
+}
+
 async function handleSell() {
     const resource   = document.getElementById("sell-resource").value;
     const amount     = parseInt(document.getElementById("sell-amount").value);
@@ -265,17 +349,21 @@ async function handleSell() {
 // ── Data loading ───────────────────────────────────────────
 
 async function refresh() {
-    const [profile, status, ranking, offers] = await Promise.all([
+    const [profile, status, ranking, offers, powerRanking, battleHistory] = await Promise.all([
         Api.getProfile(),
         Api.getResourceStatus(),
         Api.getRanking(),
         Api.getMarket(),
+        Api.getPowerRanking(),
+        Api.getBattleHistory(),
     ]);
     renderProfile(profile);
     statusCache = status;
     renderResources(statusCache);
     renderRanking(ranking);
     renderMarket(offers);
+    renderPowerRanking(powerRanking);
+    renderBattleHistory(battleHistory);
 }
 
 function tickCountdown() {

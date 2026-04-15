@@ -52,7 +52,7 @@ Todo lo de esta fase está implementado y funcionando.
 
 ---
 
-## Fase 4 — Sistema de batallas (Battle) 🔄 EN PROGRESO (1/3)
+## Fase 4 — Sistema de batallas (Battle) ✅ COMPLETA
 
 **Objetivo:** los jugadores pueden atacar a otros, el ganador roba recursos.
 
@@ -62,9 +62,10 @@ Todo lo de esta fase está implementado y funcionando.
   - `_apply_loot` — roba 20% de cada recurso del perdedor, transfiere al ganador
   - `_record_battle` — guarda en tabla `battles`
   - `get_battle_history(user_id)` — últimas 20 batallas con JOIN a usernames
+  - `get_power_ranking()` — todos los jugadores ordenados por poder (nivel × 10 + recursos ponderados // 2)
 - [x] **`handlers/battle.py`** — `/attack <username>`, `/defense`, `/history`
-- [ ] **`api/routes/battle.py`** — `POST /api/battle/attack`, `GET /api/battle/history`, `GET /api/battle/power`
-- [ ] **Frontend** — pestaña "Battle" con ranking de poder, botón de ataque e historial
+- [x] **`api/routes/battle.py`** — `POST /api/battle/attack`, `GET /api/battle/history`, `GET /api/battle/power`
+- [x] **Frontend** — pestaña "Battle" con ranking de poder (botón Attack), historial de batallas (WIN/LOSS)
 
 ---
 
@@ -106,6 +107,6 @@ Todo lo de esta fase está implementado y funcionando.
 | 1    | Núcleo jugable           | ✅ Completa   |
 | 2    | Notificaciones scheduler | ✅ Completa   |
 | 3    | Sistema de comercio      | ✅ Completa   |
-| 4    | Sistema de batallas      | 🔄 En progreso |
+| 4    | Sistema de batallas      | ✅ Completa    |
 | 5    | Limpieza y calidad       | ⬜ Pendiente  |
 | 6    | Despliegue producción    | ⬜ Futuro     |
