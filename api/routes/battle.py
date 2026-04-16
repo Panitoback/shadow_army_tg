@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Header
-from pydantic import BaseModel
+from fastapi import APIRouter, Header, HTTPException
+from pydantic import BaseModel, Field
 
 from api.auth import validate_init_data
 from services.battle_service import get_battle_history, get_power_ranking, resolve_battle
@@ -8,8 +8,14 @@ from services.player_service import get_user_by_username
 router = APIRouter()
 
 
+def _check(result: dict) -> dict:
+    if "error" in result:
+        raise HTTPException(status_code=400, detail=result["error"])
+    return result
+
+
 class AttackRequest(BaseModel):
-    username: str
+    username: str = Field(min_length=1)
 
 
 @router.post("/battle/attack")
@@ -19,10 +25,10 @@ async def attack(body: AttackRequest, x_init_data: str = Header(...)):
 
     defender = get_user_by_username(body.username)
     if not defender:
-        return {"error": "Player not found"}
+        raise HTTPException(status_code=404, detail="Player not found")
 
     defender_id = defender[0]
-    return resolve_battle(attacker_id, defender_id)
+    return _check(resolve_battle(attacker_id, defender_id))
 
 
 @router.get("/battle/history")

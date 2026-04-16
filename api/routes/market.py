@@ -1,5 +1,5 @@
-from fastapi import APIRouter, Header
-from pydantic import BaseModel
+from fastapi import APIRouter, Header, HTTPException
+from pydantic import BaseModel, Field
 
 from api.auth import validate_init_data
 from services.trading_service import buy_offer, cancel_offer, create_offer, get_active_offers
@@ -7,10 +7,16 @@ from services.trading_service import buy_offer, cancel_offer, create_offer, get_
 router = APIRouter()
 
 
+def _check(result: dict) -> dict:
+    if "error" in result:
+        raise HTTPException(status_code=400, detail=result["error"])
+    return result
+
+
 class SellRequest(BaseModel):
     resource: str
-    amount: int
-    price_gold: int
+    amount: int = Field(gt=0)
+    price_gold: int = Field(gt=0)
 
 
 @router.get("/market")
@@ -34,16 +40,16 @@ async def list_offers(x_init_data: str = Header(...)):
 @router.post("/market/sell")
 async def sell(body: SellRequest, x_init_data: str = Header(...)):
     user_data = validate_init_data(x_init_data)
-    return create_offer(user_data["id"], body.resource, body.amount, body.price_gold)
+    return _check(create_offer(user_data["id"], body.resource, body.amount, body.price_gold))
 
 
 @router.post("/market/buy/{offer_id}")
 async def buy(offer_id: int, x_init_data: str = Header(...)):
     user_data = validate_init_data(x_init_data)
-    return buy_offer(user_data["id"], offer_id)
+    return _check(buy_offer(user_data["id"], offer_id))
 
 
 @router.delete("/market/{offer_id}")
 async def cancel(offer_id: int, x_init_data: str = Header(...)):
     user_data = validate_init_data(x_init_data)
-    return cancel_offer(user_data["id"], offer_id)
+    return _check(cancel_offer(user_data["id"], offer_id))

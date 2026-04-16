@@ -261,16 +261,11 @@ async function handleBuy(btn) {
     btn.disabled = true;
     try {
         const result = await Api.buyOffer(offerId);
-        if (result.bought) {
-            const LABELS = { wood: "Wood", stone: "Stone", water: "Water", food: "Food" };
-            showToast(`Bought ${result.amount} ${LABELS[result.resource] ?? result.resource} for ${result.price_gold}g!`);
-            await refresh();
-        } else {
-            showToast(result.error ?? "Purchase failed", "#e94560");
-            btn.disabled = false;
-        }
+        const LABELS = { wood: "Wood", stone: "Stone", water: "Water", food: "Food" };
+        showToast(`Bought ${result.amount} ${LABELS[result.resource] ?? result.resource} for ${result.price_gold}g!`);
+        await refresh();
     } catch (err) {
-        console.error(err);
+        showToast(err.message || "Purchase failed", "#e94560");
         btn.disabled = false;
     }
 }
@@ -279,16 +274,11 @@ async function handleCancelOffer(btn) {
     const offerId = btn.dataset.offerId;
     btn.disabled = true;
     try {
-        const result = await Api.cancelOffer(offerId);
-        if (result.cancelled) {
-            showToast("Offer cancelled. Resources returned.");
-            await refresh();
-        } else {
-            showToast(result.error ?? "Cancel failed", "#e94560");
-            btn.disabled = false;
-        }
+        await Api.cancelOffer(offerId);
+        showToast("Offer cancelled. Resources returned.");
+        await refresh();
     } catch (err) {
-        console.error(err);
+        showToast(err.message || "Cancel failed", "#e94560");
         btn.disabled = false;
     }
 }
@@ -298,11 +288,6 @@ async function handleAttack(btn) {
     btn.disabled = true;
     try {
         const result = await Api.attackPlayer(username);
-        if (result.error) {
-            showToast(result.error, "#e94560");
-            btn.disabled = false;
-            return;
-        }
         const won = result.winner_id === myUserId;
         const stolen = result.resources_stolen;
         if (won) {
@@ -312,7 +297,7 @@ async function handleAttack(btn) {
         }
         await refresh();
     } catch (err) {
-        console.error(err);
+        showToast(err.message || "Attack failed", "#e94560");
         btn.disabled = false;
     }
 }
@@ -331,16 +316,12 @@ async function handleSell() {
     btn.disabled = true;
     try {
         const result = await Api.sellOffer(resource, amount, price_gold);
-        if (result.created) {
-            document.getElementById("sell-amount").value = "";
-            document.getElementById("sell-price").value = "";
-            showToast(`Offer #${result.offer_id} created!`);
-            await refresh();
-        } else {
-            showToast(result.error ?? "Could not create offer", "#e94560");
-        }
+        document.getElementById("sell-amount").value = "";
+        document.getElementById("sell-price").value = "";
+        showToast(`Offer #${result.offer_id} created!`);
+        await refresh();
     } catch (err) {
-        console.error(err);
+        showToast(err.message || "Could not create offer", "#e94560");
     } finally {
         btn.disabled = false;
     }

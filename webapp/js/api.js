@@ -17,7 +17,10 @@ const Api = {
         if (body) options.body = JSON.stringify(body);
 
         const res = await fetch(`${API_BASE}${path}`, options);
-        if (!res.ok) throw new Error(`API error ${res.status}: ${path}`);
+        if (!res.ok) {
+            const body = await res.json().catch(() => ({}));
+            throw new Error(body.detail || `API error ${res.status}: ${path}`);
+        }
         return res.json();
     },
 

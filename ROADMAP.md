@@ -74,13 +74,13 @@ Todo lo de esta fase está implementado y funcionando.
 **Objetivo:** dejar el proyecto listo para publicar como portfolio o para producción.
 
 **Pasos:**
-1. Eliminar o integrar `modules/` (actualmente sin uso)
+1. ~~Eliminar `modules/`~~ ✅ Ya hecho en Fase 5
 2. ~~Eliminar `scheduler.py` de la raíz~~ ✅ Ya hecho en Fase 2
-3. Crear `.env.example` con todas las variables requeridas
-4. Añadir manejo de errores global en FastAPI (handlers de excepciones)
-5. Revisar que todas las rutas API devuelvan mensajes de error consistentes
-6. Añadir validación de parámetros en los endpoints REST (Pydantic models — ya en market, extender a resources)
-7. Añadir índices a la base de datos (`user_id` en `collection_timers`, `market_offers`)
+3. ~~Crear `.env.example` con todas las variables requeridas~~ ✅ Ya hecho en Fase 5
+4. ~~Añadir manejo de errores global en FastAPI (handlers de excepciones)~~ ✅ Ya hecho en Fase 5
+5. ~~Revisar que todas las rutas API devuelvan mensajes de error consistentes~~ ✅ Ya hecho en Fase 5
+6. ~~Añadir validación de parámetros en los endpoints REST (Pydantic models — ya en market, extender a resources)~~ ✅ Ya hecho en Fase 5
+7. ~~Añadir índices a la base de datos (`user_id` en `collection_timers`, `market_offers`)~~ ✅ Ya hecho en Fase 5
 8. Añadir sistema de migraciones (Alembic) para gestionar cambios de esquema en producción
 
 ---

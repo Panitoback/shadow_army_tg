@@ -87,6 +87,32 @@ def init_db():
         )
     """)
 
+    # Indexes for frequently filtered columns
+    cur.execute("""
+        CREATE INDEX IF NOT EXISTS idx_collection_timers_user_id
+        ON collection_timers (user_id)
+    """)
+
+    cur.execute("""
+        CREATE INDEX IF NOT EXISTS idx_market_offers_seller_id
+        ON market_offers (seller_id)
+    """)
+
+    cur.execute("""
+        CREATE INDEX IF NOT EXISTS idx_market_offers_status
+        ON market_offers (status)
+    """)
+
+    cur.execute("""
+        CREATE INDEX IF NOT EXISTS idx_battles_attacker_id
+        ON battles (attacker_id)
+    """)
+
+    cur.execute("""
+        CREATE INDEX IF NOT EXISTS idx_battles_defender_id
+        ON battles (defender_id)
+    """)
+
     conn.commit()
     cur.close()
     conn.close()
